@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import Video from "./Video";
+const BASE_URL = "https://mentor-connect-backend-cuz3.onrender.com";
+
 
 export default function App() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -20,7 +22,7 @@ export default function App() {
   setMessages([]);   
   setCode("");
 
-  const socket = new WebSocket(`ws://127.0.0.1:8000/ws/${sessionId}`);
+  const socket = new WebSocket(`wss://mentor-connect-backend-cuz3.onrender.com/ws/${sessionId}`);
 
   socket.onmessage = (event) => {
     const data = JSON.parse(event.data);
@@ -63,7 +65,7 @@ socket.onclose = () => {
 
       case "sessions":
         const createSession = async () => {
-  const res = await fetch("http://127.0.0.1:8000/sessions/create", {
+  const res = await fetch("${BASE_URL}/sessions/create", {
     method: "POST",
   });
 
@@ -84,7 +86,7 @@ socket.onclose = () => {
     return;
   }
 
-  const res = await fetch(`http://127.0.0.1:8000/sessions/join/${inputSessionId}`, {
+  const res = await fetch(`${BASE_URL}/sessions/join/${inputSessionId}`, {
     method: "POST",
   });
 
