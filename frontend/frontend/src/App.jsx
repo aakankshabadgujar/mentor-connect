@@ -65,19 +65,29 @@ socket.onclose = () => {
 
       case "sessions":
         const createSession = async () => {
-  const res = await fetch("${BASE_URL}/sessions/create", {
-    method: "POST",
-  });
+  try {
+    const res = await fetch(`${BASE_URL}/sessions/create`, {
+      method: "POST",
+    });
 
-  const data = await res.json();
+    const text = await res.text();
 
-  setSessionId(data.session_id);
-  setIsJoined(true);       
-  setInputSessionId(data.session_id);   
+    if (!text) {
+      alert("❌ Empty response");
+      return;
+    }
 
-  alert("✅ Session Created: " + data.session_id);
-  console.log("Created session:", data.session_id);
-  setActiveTab("chat");
+    const data = JSON.parse(text);
+
+    setSessionId(data.session_id);
+    setIsJoined(true);
+    setInputSessionId(data.session_id);
+    setActiveTab("chat");
+
+  } catch (err) {
+    console.error(err);
+    alert("❌ Failed to create session");
+  }
 };
 
          const joinSession = async () => {
@@ -86,22 +96,31 @@ socket.onclose = () => {
     return;
   }
 
-  const res = await fetch(`${BASE_URL}/sessions/join/${inputSessionId}`, {
-    method: "POST",
-  });
+  try {
+    const res = await fetch(`${BASE_URL}/sessions/join/${inputSessionId}`);
 
-  const data = await res.json();
+    const text = await res.text();
 
-  if (!data.success) {
-    alert("❌ Session does not exist");
-    return;
+    if (!text) {
+      alert("❌ Empty response from server");
+      return;
+    }
+
+    const data = JSON.parse(text);
+
+    if (!data.success) {
+      alert("❌ Session does not exist");
+      return;
+    }
+
+    setSessionId(inputSessionId);
+    setIsJoined(true);
+    setActiveTab("chat");
+
+  } catch (err) {
+    console.error(err);
+    alert("❌ Something went wrong");
   }
-
- setSessionId(inputSessionId);
-setIsJoined(true);
-  alert("✅ Joined session: " + inputSessionId);
-  console.log("Joining session:", inputSessionId);
-  setActiveTab("chat");
 };
         return (
           <div className="max-w-4xl mx-auto mt-10">
