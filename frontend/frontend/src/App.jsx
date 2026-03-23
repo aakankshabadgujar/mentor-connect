@@ -90,23 +90,21 @@ socket.onclose = () => {
   }
 };
 
-         const joinSession = async () => {
+        const joinSession = async () => {
   if (!inputSessionId) {
     alert("Enter session ID");
     return;
   }
 
   try {
-    const res = await fetch(`${BASE_URL}/sessions/join/${inputSessionId}`);
+    const res = await fetch(
+      `${BASE_URL}/sessions/join/${inputSessionId}`,
+      {
+        method: "POST",   // ✅ THIS WAS MISSING
+      }
+    );
 
-    const text = await res.text();
-
-    if (!text) {
-      alert("❌ Empty response from server");
-      return;
-    }
-
-    const data = JSON.parse(text);
+    const data = await res.json();
 
     if (!data.success) {
       alert("❌ Session does not exist");
@@ -119,7 +117,7 @@ socket.onclose = () => {
 
   } catch (err) {
     console.error(err);
-    alert("❌ Something went wrong");
+    alert("❌ Error joining session");
   }
 };
         return (
